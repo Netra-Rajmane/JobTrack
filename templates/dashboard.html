@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | JobTrack{% endblock %}
+{% block content %}
+<div class="page-intro">
+  <div><span class="eyebrow">YOUR CAREER OVERVIEW</span><h1>Welcome back <span class="wave">✦</span></h1><p>Here’s what’s happening with your job search. Keep the momentum going.</p></div>
+  <a class="btn primary" href="{{ url_for('add_application') }}">＋ Add new application</a>
+</div>
+<div class="stats">
+  <article class="stat-card"><div class="stat-top"><span>Total applications</span><span class="stat-icon purple">▤</span></div><strong>{{ stats.total }}</strong><small>All tracked opportunities</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Interviews</span><span class="stat-icon blue">◷</span></div><strong>{{ stats.interviews }}</strong><small>Interview opportunities</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Offers received</span><span class="stat-icon green">✓</span></div><strong>{{ stats.selected }}</strong><small>Successful applications</small></article>
+  <article class="stat-card"><div class="stat-top"><span>Not selected</span><span class="stat-icon orange">↗</span></div><strong>{{ stats.rejected }}</strong><small>Applications closed</small></article>
+</div>
+<div class="dashboard-grid">
+  <section class="panel">
+    <div class="panel-heading"><div><h2>Recent applications</h2><p>Your latest job search activity</p></div><a class="text-link" href="{{ url_for('applications') }}">View all →</a></div>
+    <div class="table-scroll"><table><thead><tr><th>COMPANY & ROLE</th><th>DATE APPLIED</th><th>STATUS</th></tr></thead><tbody>
+    {% for job in recent %}
+      <tr><td><div class="company"><span class="company-logo">{{ job.company[0]|upper }}</span><span><b>{{ job.company }}</b><small>{{ job.role }}</small></span></div></td><td>{{ job.applied_date }}</td><td><span class="badge {{ job.status|lower }}">{{ job.status }}</span></td></tr>
+    {% else %}
+      <tr><td colspan="3"><div class="empty"><span>▤</span><b>No applications yet</b><p>Add your first opportunity to start tracking your progress.</p><a href="{{ url_for('add_application') }}">＋ Add an application</a></div></td></tr>
+    {% endfor %}
+    </tbody></table></div>
+  </section>
+  <section class="panel analytics">
+    <div class="panel-heading"><div><h2>Application overview</h2><p>Distribution by current status</p></div></div>
+    <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+    <div class="chart-total"><span>Total applications</span><b>{{ stats.total }}</b></div>
+  </section>
+</div>
+<div class="callout"><span>✦</span><div><b>Your next opportunity could be around the corner.</b><p>Keep your application details updated and follow up with recruiters regularly.</p></div></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const statusData = {{ status_counts|list|tojson }};
+const canvas = document.getElementById('statusChart');
+if (canvas) {
+  new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: statusData.map(x => x.status),
+      datasets: [{ data: statusData.map(x => x.count),
+        backgroundColor: ['#7565e8','#3995e8','#f2a541','#24b88a','#e56b78'],
+        borderWidth: 0, hoverOffset: 6 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '72%',
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18, boxWidth: 8 } } } }
+  });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}JobTrack{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('dashboard') }}"><span class="brand-mark">J</span><span><b>JobTrack</b><small>CAREER COMPANION</small></span></a>
+    <div class="nav-caption">WORKSPACE</div>
+    <nav class="nav">
+      <a class="{% if request.endpoint == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span>▦</span> Dashboard</a>
+      <a class="{% if request.endpoint == 'applications' %}active{% endif %}" href="{{ url_for('applications') }}"><span>▤</span> My Applications</a>
+      <a class="{% if request.endpoint in ['add_application', 'edit_application'] %}active{% endif %}" href="{{ url_for('add_application') }}"><span>＋</span> Add Application</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="tip-card"><span class="sparkle">✦</span><b>Keep moving forward</b><p>Small steps every day bring you closer to your next opportunity.</p></div>
+      <div class="profile"><span class="avatar">U</span><span><b>Job Seeker</b><small>Personal workspace</small></span></div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><span class="crumb">WORKSPACE <i>/</i> JOBTRACK</span><span class="saved"><i></i> Your career, organized <span class="avatar small">U</span></span></header>
+    <section class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}<button type="button" onclick="this.parentElement.remove()" aria-label="Dismiss">×</button></div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </section>
+    <footer>© 2026 JobTrack · Built to organize your career journey.</footer>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

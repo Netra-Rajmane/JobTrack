@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{% if application %}Edit{% else %}Add{% endif %} application | JobTrack{% endblock %}
+{% block content %}
+<div class="page-intro">
+  <div><span class="eyebrow">CAREER MANAGEMENT</span><h1>{% if application %}Edit application{% else %}Add new application{% endif %}</h1><p>Capture the details now so you can focus on what comes next.</p></div>
+  <a class="btn light" href="{{ url_for('applications') }}">← Back to applications</a>
+</div>
+<section class="panel form-panel">
+  <div class="form-title"><span class="form-symbol">✦</span><div><h2>Application details</h2><p>Fields marked with * are required.</p></div></div>
+  <form method="POST" action="{% if application %}{{ url_for('edit_application', application_id=application.id) }}{% else %}{{ url_for('add_application') }}{% endif %}">
+    <div class="form-grid">
+      <label>Company name *<input name="company" required placeholder="e.g. Google" value="{{ application.company if application else '' }}"></label>
+      <label>Job role *<input name="role" required placeholder="e.g. Software Engineer" value="{{ application.role if application else '' }}"></label>
+      <label>Location<input name="location" placeholder="e.g. Pune, Maharashtra" value="{{ application.location if application else '' }}"></label>
+      <label>Expected salary<input name="salary" placeholder="e.g. 6–8 LPA" value="{{ application.salary if application else '' }}"></label>
+      <label>Application date *<input type="date" name="applied_date" required value="{{ application.applied_date if application else today }}"></label>
+      <label>Job type<select name="job_type"><option value="">Select job type</option>{% for item in job_types %}<option value="{{ item }}" {% if application and application.job_type == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></label>
+      <label class="full">Application status *<select name="status" required>{% for item in statuses %}<option value="{{ item }}" {% if application and application.status == item %}selected{% elif not application and item == 'Applied' %}selected{% endif %}>{{ item }}</option>{% endfor %}</select></label>
+      <label class="full">Job posting link<input type="url" name="job_link" placeholder="https://company.com/careers/job" value="{{ application.job_link if application else '' }}"></label>
+      <label class="full">Notes<textarea name="notes" rows="4" placeholder="Recruiter details, interview dates, follow-up reminders...">{{ application.notes if application else '' }}</textarea></label>
+    </div>
+    <div class="form-actions"><a class="btn light" href="{{ url_for('applications') }}">Cancel</a><button class="btn primary" type="submit">{% if application %}Save changes{% else %}Save application{% endif %} →</button></div>
+  </form>
+</section>
+{% endblock %}

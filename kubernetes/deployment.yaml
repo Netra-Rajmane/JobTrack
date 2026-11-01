@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobtrack
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jobtrack
+  template:
+    metadata:
+      labels:
+        app: jobtrack
+    spec:
+      containers:
+        - name: jobtrack
+          image: jobtrack:1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            - name: SECRET_KEY
+              value: "replace-this-before-production"
+          volumeMounts:
+            - name: jobtrack-data
+              mountPath: /app/instance
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      volumes:
+        - name: jobtrack-data
+          persistentVolumeClaim:
+            claimName: jobtrack-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jobtrack-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}My Applications | JobTrack{% endblock %}
+{% block content %}
+<div class="page-intro">
+  <div><span class="eyebrow">CAREER MANAGEMENT</span><h1>My applications</h1><p>Every opportunity in one place. Stay organized and in control.</p></div>
+  <a class="btn primary" href="{{ url_for('add_application') }}">＋ Add application</a>
+</div>
+<section class="panel filter-panel">
+  <form class="filters" method="GET" action="{{ url_for('applications') }}">
+    <label class="search"><span>⌕</span><input name="search" value="{{ search }}" placeholder="Search company or job role..."></label>
+    <select name="status"><option value="">All statuses</option>{% for item in statuses %}<option value="{{ item }}" {% if selected_status == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+    <button class="btn primary" type="submit">Apply filters</button><a class="btn light" href="{{ url_for('applications') }}">Reset</a>
+  </form>
+</section>
+<div class="list-heading"><h2>All applications</h2><span>{{ applications|length }} result(s)</span></div>
+<section class="panel table-panel"><div class="table-scroll"><table class="wide-table"><thead><tr><th>COMPANY & ROLE</th><th>LOCATION</th><th>DATE APPLIED</th><th>JOB TYPE</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody>
+{% for job in applications %}
+<tr>
+<td><div class="company"><span class="company-logo">{{ job.company[0]|upper }}</span><span><b>{{ job.company }}</b><small>{{ job.role }}</small></span></div></td>
+<td>{{ job.location or '—' }}</td><td>{{ job.applied_date }}</td><td>{{ job.job_type or '—' }}</td>
+<td><span class="badge {{ job.status|lower }}">{{ job.status }}</span></td>
+<td><div class="actions"><a class="action edit" href="{{ url_for('edit_application', application_id=job.id) }}">Edit</a><form method="POST" action="{{ url_for('delete_application', application_id=job.id) }}" onsubmit="return confirm('Delete this application?')"><button class="action delete" type="submit">Delete</button></form></div></td>
+</tr>
+{% else %}
+<tr><td colspan="6"><div class="empty"><span>▤</span><b>No applications found</b><p>Try another search or add a new opportunity.</p><a href="{{ url_for('add_application') }}">＋ Add your first application</a></div></td></tr>
+{% endfor %}
+</tbody></table></div></section>
+{% endblock %}
